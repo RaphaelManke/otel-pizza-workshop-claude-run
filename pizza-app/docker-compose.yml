@@ -24,6 +24,7 @@ services:
       - OTEL_SERVICE_NAME=order-service
       - OTEL_RESOURCE_ATTRIBUTES=service.namespace=pizza-app
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_ENDPOINT=${DASH0_ENDPOINT}
       - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer ${DASH0_AUTH_TOKEN},Dash0-Dataset=${DASH0_DATASET:-default}
     healthcheck:
@@ -52,6 +53,7 @@ services:
       - OTEL_SERVICE_NAME=kitchen-service
       - OTEL_RESOURCE_ATTRIBUTES=service.namespace=pizza-app
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_ENDPOINT=${DASH0_ENDPOINT}
       - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer ${DASH0_AUTH_TOKEN},Dash0-Dataset=${DASH0_DATASET:-default}
     healthcheck:
@@ -75,6 +77,7 @@ services:
       - OTEL_SERVICE_NAME=delivery-service
       - OTEL_RESOURCE_ATTRIBUTES=service.namespace=pizza-app
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_LOGS_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_ENDPOINT=${DASH0_ENDPOINT}
       - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer ${DASH0_AUTH_TOKEN},Dash0-Dataset=${DASH0_DATASET:-default}
     healthcheck:
