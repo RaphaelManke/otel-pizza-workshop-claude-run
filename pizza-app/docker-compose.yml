@@ -1,12 +1,16 @@
 # Pizza Order Tracker - workshop stack
 #
-# Compose reads variable values (DASH0_AUTH_TOKEN, DASH0_ENDPOINT, SLOW_KITCHEN,
-# NO_DRIVERS, ...) from the `.env` file that sits NEXT TO THIS FILE, i.e.
-# `pizza-app/.env`. Create it from inside pizza-app/:
+# Compose reads variable values (DASH0_AUTH_TOKEN, DASH0_ENDPOINT, DASH0_DATASET,
+# SLOW_KITCHEN, NO_DRIVERS, ...) from the `.env` file that sits NEXT TO THIS
+# FILE, i.e. `pizza-app/.env`. Create it from inside pizza-app/:
 #
 #     cp .env.template .env
 #
 # An `.env` anywhere else (the repo root, for example) is NOT read.
+#
+# Each Node service is auto-instrumented with OpenTelemetry via
+# NODE_OPTIONS/OTEL_* env vars below, so no tracing code was added to the
+# services themselves. See @opentelemetry/auto-instrumentations-node.
 
 services:
   order-service:
@@ -16,6 +20,12 @@ services:
     environment:
       - KITCHEN_SERVICE_URL=http://kitchen-service:3001
       - DELIVERY_SERVICE_URL=http://delivery-service:3002
+      - NODE_OPTIONS=--require @opentelemetry/auto-instrumentations-node/register
+      - OTEL_SERVICE_NAME=order-service
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=pizza-app
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${DASH0_ENDPOINT}
+      - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer ${DASH0_AUTH_TOKEN},Dash0-Dataset=${DASH0_DATASET:-default}
     healthcheck:
       test:
         - CMD
@@ -38,6 +48,12 @@ services:
       - "3001:3001"
     environment:
       - SLOW_KITCHEN=${SLOW_KITCHEN:-false}
+      - NODE_OPTIONS=--require @opentelemetry/auto-instrumentations-node/register
+      - OTEL_SERVICE_NAME=kitchen-service
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=pizza-app
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${DASH0_ENDPOINT}
+      - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer ${DASH0_AUTH_TOKEN},Dash0-Dataset=${DASH0_DATASET:-default}
     healthcheck:
       test:
         - CMD
@@ -55,6 +71,12 @@ services:
       - "3002:3002"
     environment:
       - NO_DRIVERS=${NO_DRIVERS:-false}
+      - NODE_OPTIONS=--require @opentelemetry/auto-instrumentations-node/register
+      - OTEL_SERVICE_NAME=delivery-service
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=pizza-app
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${DASH0_ENDPOINT}
+      - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer ${DASH0_AUTH_TOKEN},Dash0-Dataset=${DASH0_DATASET:-default}
     healthcheck:
       test:
         - CMD
